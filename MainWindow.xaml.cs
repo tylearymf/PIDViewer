@@ -32,10 +32,6 @@ namespace PIDViewer
             {
                 Title = title;
                 Content = content;
-
-                content.IsReadOnly = true;
-                content.BorderThickness = new Thickness(0);
-                ToolTipService.SetShowDuration(content, int.MaxValue);
             }
 
             public void SetText(object v)
@@ -95,7 +91,10 @@ namespace PIDViewer
                         labelValue.TextWrapping = TextWrapping.Wrap;
                         labelValue.TextAlignment = TextAlignment.Left;
                         labelValue.HorizontalAlignment = HorizontalAlignment.Left;
+                        labelValue.IsReadOnly = true;
+                        labelValue.BorderThickness = new Thickness(0);
                         labelValue.Text = string.Empty;
+                        ToolTipService.SetShowDuration(labelValue, int.MaxValue);
                         stackPanel.Children.Add(labelValue);
 
                         var labelKeyValue = new LabelKeyValue(labelKey, labelValue);
@@ -175,7 +174,6 @@ namespace PIDViewer
             Title = "PIDViewer";
             MaxWidth = MinWidth = Width = MainViewWidth;
             ResizeMode = ResizeMode.CanMinimize;
-            grid.Margin = new Thickness(10);
 
             var children = grid.Children;
             var stackPanel = new StackPanel();
