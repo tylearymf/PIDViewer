@@ -215,7 +215,9 @@ namespace PIDViewer
 
         void Kill_Click(object sender, RoutedEventArgs e)
         {
-            PIDManager.Instance.KillForegroundWindow();
+            var processName = PIDManager.Instance.ForegroundProcessInfo?.Name;
+            if (!string.IsNullOrEmpty(processName) && MessageBox.Show($"是否确定终止 {processName} ?", "提示", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                PIDManager.Instance.KillForegroundWindow();
         }
 
         void SetDark()
