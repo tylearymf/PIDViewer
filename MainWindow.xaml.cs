@@ -55,6 +55,8 @@ namespace PIDViewer
             public LabelKeyValue Argument { set; get; }
             public Button Kill { set; get; }
 
+            public MyProcessInfo Info;
+
 
             public IEnumerable<UIElement> CreatePanels()
             {
@@ -143,6 +145,7 @@ namespace PIDViewer
 
             public void SetData(MyProcessInfo processInfo)
             {
+                Info = processInfo;
                 PID.SetText(processInfo.PID);
                 Title.SetText(processInfo.Title);
                 Name.SetText(processInfo.Name);
@@ -153,6 +156,7 @@ namespace PIDViewer
         }
 
 
+        TextBox input;
         ViewInfo viewInfo;
 
         public MainWindow()
@@ -166,7 +170,11 @@ namespace PIDViewer
 
         void Instance_OnForegroundWindowChanged(MyProcessInfo info)
         {
-            UpdateInfo(info);
+            if (info != null && viewInfo?.Info == info)
+                UpdateInfo(info);
+
+            if (string.IsNullOrEmpty(input.Text))
+                UpdateInfo(info);
         }
 
         void InitView()
@@ -180,6 +188,10 @@ namespace PIDViewer
             stackPanel.Orientation = Orientation.Vertical;
             stackPanel.HorizontalAlignment = HorizontalAlignment.Left;
             children.Add(stackPanel);
+
+            input = new TextBox();
+            input.TextChanged += Input_TextChanged;
+            stackPanel.Children.Add(input);
 
             viewInfo = new ViewInfo();
             foreach (var item in viewInfo.CreatePanels())
@@ -200,6 +212,19 @@ namespace PIDViewer
             {
                 Console.WriteLine(ex);
                 SetLight();
+            }
+        }
+
+        void Input_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(input.Text, out var pid))
+            {
+                try
+                {
+                    var info = PIDManager.Instance.GetProcessInfo(pid);
+                    UpdateInfo(info);
+                }
+                catch { }
             }
         }
 

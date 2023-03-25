@@ -74,7 +74,12 @@ namespace PIDViewer
             if (currentInfo != null && currentInfo.PID == pid)
                 return currentInfo;
 
-            var process = pid == 0 ? null : Process.GetProcessById((int)pid);
+            return GetProcessInfo((int)pid);
+        }
+
+        public MyProcessInfo GetProcessInfo(int pid)
+        {
+            var process = pid == 0 ? null : Process.GetProcessById(pid);
             return new MyProcessInfo(process);
         }
 
@@ -98,14 +103,14 @@ namespace PIDViewer
                 SendChangedEvent();
         }
 
-        public void SendChangedEvent()
+        public void SendChangedEvent(MyProcessInfo processInfo = null)
         {
-            OnForegroundWindowChanged?.Invoke(ForegroundProcessInfo);
+            OnForegroundWindowChanged?.Invoke(processInfo ?? ForegroundProcessInfo);
         }
 
-        public void PostUpdateInfo()
+        public void PostUpdateInfo(MyProcessInfo processInfo)
         {
-            synchronizationContext.Post(state => { SendChangedEvent(); }, null);
+            synchronizationContext.Post(state => { SendChangedEvent(processInfo); }, null);
         }
     }
 
@@ -142,7 +147,7 @@ namespace PIDViewer
                     Task.Factory.StartNew(() =>
                     {
                         Argument = process?.GetCommandLine();
-                        PIDManager.Instance.PostUpdateInfo();
+                        PIDManager.Instance.PostUpdateInfo(this);
                     });
                 }
             }
