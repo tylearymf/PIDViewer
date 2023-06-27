@@ -79,8 +79,16 @@ namespace PIDViewer
 
         public MyProcessInfo GetProcessInfo(int pid)
         {
-            var process = pid == 0 ? null : Process.GetProcessById(pid);
-            return new MyProcessInfo(process);
+            try
+            {
+                var process = pid == 0 ? null : Process.GetProcessById(pid);
+                return new MyProcessInfo(process);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return MyProcessInfo.Empty;
+            }
         }
 
         public void UpdateInfo()
@@ -159,13 +167,21 @@ namespace PIDViewer
 
         public bool UpdateTitle()
         {
-            var process = Process;
-            var title = process == null ? string.Empty : GetWindowTitle(process.MainWindowHandle);
-            var hasChanged = Title != title;
+            try
+            {
+                var process = Process;
+                var title = process == null ? string.Empty : GetWindowTitle(process.MainWindowHandle);
+                var hasChanged = Title != title;
 
-            Title = title;
+                Title = title;
 
-            return hasChanged;
+                return hasChanged;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
         }
 
         public void Reset()
@@ -180,14 +196,21 @@ namespace PIDViewer
 
         public bool Kill()
         {
-            var process = Process;
-            Process = null;
-
-            if (process != null && !process.HasExited)
+            try
             {
-                process.Kill();
+                var process = Process;
+                Process = null;
 
-                return true;
+                if (process != null && !process.HasExited)
+                {
+                    process.Kill();
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
 
             return false;
